@@ -27,6 +27,29 @@
     </dependency>
   </dependencies>
 
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <distributionManagement>
+                <repository>
+                    <id>artifactory</id>
+                    <name>artifactory-k8s-deployment-74699cf9d5-x4cj9-releases</name>
+                    <url>http://artifactory/artifactory/libs-release</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>local</id>
+            <distributionManagement>
+                <repository>
+                    <id>artifactory</id>
+                    <name>artifactory-k8s-deployment-74699cf9d5-x4cj9-releases</name>
+                    <url>http://artifactory.127.0.0.1.nip.io/artifactory/libs-release</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
