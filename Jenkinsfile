@@ -54,6 +54,7 @@ spec:
                     // #1 = credentialsId for artifactory
                     // #2 = distributionManagement.id
                     generateMavenSettings('artifactory', 'releases')
+                    sh 'ls -lath'
                     sh 'mvn deploy -s jenkins-settings.xml'
                 }
             }
