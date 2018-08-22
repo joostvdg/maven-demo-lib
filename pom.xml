@@ -31,7 +31,7 @@
         <repository>
             <id>artifactory</id>
             <name>artifactory</name>
-            <url>http://artifactory/artifactory/libs-release</url>
+            <url>http://artifactory/artifactory/libs-release-local</url>
         </repository>
     </distributionManagement>
 
