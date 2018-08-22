@@ -6,7 +6,7 @@
 
   <groupId>com.github.joostvdg.demo</groupId>
   <artifactId>maven-demo-lib</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 
   <name>maven-demo-lib</name>
   <!-- FIXME change it to the project's website -->
@@ -29,7 +29,7 @@
 
     <distributionManagement>
         <repository>
-            <id>artifactory</id>
+            <id>releases</id>
             <name>artifactory</name>
             <url>http://artifactory/artifactory/libs-release-local</url>
         </repository>
@@ -40,7 +40,7 @@
             <id>local</id>
             <distributionManagement>
                 <repository>
-                    <id>artifactory</id>
+                    <id>releases</id>
                     <name>artifactory</name>
                     <url>http://artifactory.127.0.0.1.nip.io/artifactory/libs-release</url>
                 </repository>
