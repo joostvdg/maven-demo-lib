@@ -1,3 +1,5 @@
+def scmVars
+
 pipeline {
     options {
         buildDiscarder logRotator(artifactDaysToKeepStr: '5', artifactNumToKeepStr: '5', daysToKeepStr: '5', numToKeepStr: '5')
@@ -38,14 +40,16 @@ spec:
         }
         stage('Checkout') {
             steps {
-                checkout scm
-                echo "SCM=${scm}"
-                gitJenkinsConfig()
+                script {
+                    scmVars = checkout scm
+                }
+                echo "scmVars=${scmVars}"
+                gitRemoteConfig('joostvdg', 'maven-demo-lib', 'githubtoken')
                 sh '''
                 git config --global user.email "jenkins@jenkins.io"
                 git config --global user.name "Jenkins"
                 '''
-                sh 'env'
+                //sh 'env'
             }
         }
         stage('Build') {
