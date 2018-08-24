@@ -60,18 +60,30 @@ spec:
                 }
             }
         }
-        stage('Version Bump') {
-            when { branch 'master' }
-            environment {
-                NEW_VERSION = gitNextSemverTagMaven('pom.xml')
-            }
-            steps {
-                container('maven') {
-                    sh "mvn versions:set -DnewVersion=${NEW_VERSION}"
+        stage('Version & Analysis') {
+            parallel {
+                stage('Version Bump') {
+                    when { branch 'master' }
+                    environment {
+                        NEW_VERSION = gitNextSemverTagMaven('pom.xml')
+                    }
+                    steps {
+                        container('maven') {
+                            sh "mvn versions:set -DnewVersion=${NEW_VERSION}"
+                        }
+                        gitTag("v${NEW_VERSION}")
+                    }
                 }
-                sh 'env'
-                gitTag("v${NEW_VERSION}")
-                // TODO: change this to env.BRANCH_NAME
+                stage('Sonar Analysis') {
+                    when {branch 'master'}
+                    environment {
+                        SONAR_HOST="http://sonar:9000"
+                        SONAR_TOKEN=credentials('sonar')
+                    }
+                    steps {
+                        sh "mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
+                    }
+                }
             }
         }
         stage('Publish Artifact') {
