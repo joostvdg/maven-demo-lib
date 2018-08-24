@@ -77,7 +77,7 @@ spec:
                 stage('Sonar Analysis') {
                     when {branch 'master'}
                     environment {
-                        SONAR_HOST="http://sonar:9000"
+                        SONAR_HOST="http://sonar-sonarqube:9000"
                         SONAR_TOKEN=credentials('sonar')
                     }
                     steps {
