@@ -44,6 +44,10 @@ spec:
             steps {
                 checkout scm
                 gitJenkinsConfig()
+                sh '''
+                git config --global user.email "jenkins@jenkins.io"
+                git config --global user.name "Jenkins"
+                '''
             }
         }
         stage('Build') {
