@@ -7,6 +7,10 @@ pipeline {
     libraries {
         lib('joostvdg@master')
     }
+    environment {
+        CURRENT_VERSION = ""
+        NEW_VERSION = ""
+    }
     agent {
         kubernetes {
             label 'mypod'
@@ -38,7 +42,8 @@ spec:
         }
         stage('Checkout') {
             steps {
-                git 'https://github.com/joostvdg/maven-demo-lib.git'
+                checkout scm
+                gitJenkinsConfig()
             }
         }
         stage('Build') {
@@ -48,13 +53,26 @@ spec:
                 }
             }
         }
-        stage('Maven Deploy') {
+        stage('Version Bump') {
+            // when { branch 'master' }
+            environment {
+                NEW_VERSION = gitNextSemverTagMaven('pom.xml')
+            }
+            steps {
+                container('maven') {
+                    sh 'env'
+                    sh "mvn versions:set -DnewVersion=${NEW_VERSION}"
+                }
+                gitTag("v${NEW_VERSION}")
+                // TODO: change this to env.BRANCH_NAME
+            }
+        }
+        stage('Publish Artifact') {
             steps {
                 container('maven') {
                     // #1 = credentialsId for artifactory
                     // #2 = distributionManagement.id
                     generateMavenSettings('artifactory', 'releases')
-                    sh 'ls -lath'
                     sh 'mvn deploy -s jenkins-settings.xml'
                 }
             }
@@ -63,6 +81,11 @@ spec:
                     cleanMavenSettings()
                 }
             }
+        }
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
