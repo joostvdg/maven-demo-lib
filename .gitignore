@@ -26,3 +26,5 @@ hs_err_pid*
 /target
 jenkins-settings.xml
 settings.xml
+pom.xml.versionsBackup
+
