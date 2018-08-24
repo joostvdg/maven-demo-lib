@@ -44,7 +44,8 @@ spec:
                     scmVars = checkout scm
                 }
                 echo "scmVars=${scmVars}"
-                gitRemoteConfig('joostvdg', 'maven-demo-lib', 'githubtoken')
+                //gitRemoteConfig('joostvdg', 'maven-demo-lib', 'githubtoken')
+                gitRemoteConfigByUrl(scmVars.GIT_URL, 'githubtoken')
                 sh '''
                 git config --global user.email "jenkins@jenkins.io"
                 git config --global user.name "Jenkins"
