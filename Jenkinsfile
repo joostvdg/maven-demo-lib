@@ -7,10 +7,6 @@ pipeline {
     libraries {
         lib('joostvdg@master')
     }
-    environment {
-        CURRENT_VERSION = ""
-        NEW_VERSION = ""
-    }
     agent {
         kubernetes {
             label 'mypod'
@@ -42,12 +38,12 @@ spec:
         }
         stage('Checkout') {
             steps {
-                checkout scm
                 gitJenkinsConfig()
                 sh '''
                 git config --global user.email "jenkins@jenkins.io"
                 git config --global user.name "Jenkins"
                 '''
+                sh 'env'
             }
         }
         stage('Build') {
@@ -64,9 +60,9 @@ spec:
             }
             steps {
                 container('maven') {
-                    sh 'env'
                     sh "mvn versions:set -DnewVersion=${NEW_VERSION}"
                 }
+                sh 'env'
                 gitTag("v${NEW_VERSION}")
                 // TODO: change this to env.BRANCH_NAME
             }
