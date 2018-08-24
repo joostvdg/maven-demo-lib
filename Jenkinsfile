@@ -81,7 +81,9 @@ spec:
                         SONAR_TOKEN=credentials('sonar')
                     }
                     steps {
-                        sh "mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
+                        container('maven') {
+                            sh "mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
+                        }
                     }
                 }
             }
