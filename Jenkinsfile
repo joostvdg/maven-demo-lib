@@ -38,6 +38,8 @@ spec:
         }
         stage('Checkout') {
             steps {
+                checkout scm
+                echo "SCM=${scm}"
                 gitJenkinsConfig()
                 sh '''
                 git config --global user.email "jenkins@jenkins.io"
@@ -54,7 +56,7 @@ spec:
             }
         }
         stage('Version Bump') {
-            // when { branch 'master' }
+            when { branch 'master' }
             environment {
                 NEW_VERSION = gitNextSemverTagMaven('pom.xml')
             }
@@ -68,6 +70,7 @@ spec:
             }
         }
         stage('Publish Artifact') {
+            when { branch 'master' }
             steps {
                 container('maven') {
                     // #1 = credentialsId for artifactory
