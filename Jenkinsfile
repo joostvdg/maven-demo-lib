@@ -69,7 +69,7 @@ spec:
                     }
                     steps {
                         container('maven') {
-                            sh "mvn versions:set -DnewVersion=${NEW_VERSION}"
+                            sh 'mvn versions:set -DnewVersion=${NEW_VERSION}'
                         }
                         gitTag("v${NEW_VERSION}")
                     }
@@ -82,7 +82,7 @@ spec:
                     }
                     steps {
                         container('maven') {
-                            sh "mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
+                            sh 'mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}'
                         }
                     }
                 }
