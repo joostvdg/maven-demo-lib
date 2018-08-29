@@ -54,7 +54,7 @@ pipeline {
                     when {
                         expression {
                             NEW_VERSION = gitNextSemverTagMaven('pom.xml')
-                            return env.BRANCH_NAME == 'origin/master' &&  NEW_VERSION != ''
+                            return env.BRANCH_NAME == 'master' &&  NEW_VERSION != ''
                         }
                     }
                     steps {
