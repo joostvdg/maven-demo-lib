@@ -10,6 +10,12 @@ pipeline {
         lib('joostvdg@master')
     }
     agent { label 'maven-jdk-8'}
+    parameters {
+        string (
+            defaultValue: '',
+            description: '',
+            name : 'NEW_VERSION')
+    }
     stages {
         stage('Test versions') {
             steps {
@@ -45,12 +51,14 @@ pipeline {
         stage('Version & Analysis') {
             parallel {
                 stage('Version Bump') {
-                    when { branch 'master' }
-                    environment {
-                        NEW_VERSION = gitNextSemverTagMaven('pom.xml')
+                    when {
+                        expression {
+                            NEW_VERSION = gitNextSemverTagMaven('pom.xml')
+                            return env.BRANCH_NAME == 'origin/master' &&  NEW_VERSION != ''
+                        }
                     }
                     steps {
-                        sh 'mvn versions:set -DnewVersion=${NEW_VERSION}'
+                        sh "mvn versions:set -DnewVersion=${NEW_VERSION}"
                         gitTag("v${NEW_VERSION}")
                     }
                 }
