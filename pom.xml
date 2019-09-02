@@ -28,11 +28,11 @@
   </dependencies>
 
     <distributionManagement>
-        <repository>
+<!--         <repository>
             <id>releases</id>
             <name>artifactory</name>
             <url>http://artifactory/artifactory/libs-release</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>nexus</id>
             <name>nexus</name>
