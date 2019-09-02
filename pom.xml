@@ -33,6 +33,11 @@
             <name>artifactory</name>
             <url>http://artifactory/artifactory/libs-release</url>
         </repository>
+        <repository>
+            <id>nexus</id>
+            <name>nexus</name>
+            <url>https://nexus.gke.kearos.net/repository/maven-releases/</url>
+        </repository>
     </distributionManagement>
 
     <profiles>
