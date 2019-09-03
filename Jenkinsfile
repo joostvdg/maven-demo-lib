@@ -7,7 +7,8 @@ pipeline {
         timeout(5)
     }
     libraries {
-        lib('joostvdg@master')
+        lib('jpl-core@master') // https://github.com/joostvdg/jpl-core
+        lib('jpl-maven@master') // https://github.com/joostvdg/jpl-maven
     }
     agent {
         kubernetes {
@@ -26,6 +27,14 @@ spec:
     command:
     - cat
     tty: true
+    volumeMounts:
+      - name: maven-cache
+        mountPath: /root/.m2/repository
+  volumes:
+    - name: maven-cache
+      hostPath:
+        path: /tmp
+        type: Directory
 """
         }
     }
@@ -41,10 +50,12 @@ spec:
         stage('Checkout') {
             steps {
                 script {
+                    // use this if used within Multibranch or Org Job
                     scmVars = checkout scm
+                    // use this if used within a Pipeline Job
+                    // scmVars = git('https://github.com/joostvdg/maven-demo-lib.git')
                 }
                 echo "scmVars=${scmVars}"
-                //gitRemoteConfig('joostvdg', 'maven-demo-lib', 'githubtoken')
                 gitRemoteConfigByUrl(scmVars.GIT_URL, 'githubtoken')
                 sh '''
                 git config --global user.email "jenkins@jenkins.io"
@@ -56,14 +67,16 @@ spec:
         stage('Build') {
             steps {
                 container('maven') {
-                    sh 'mvn clean verify'
+                    sh 'mvn clean verify -C -e --show-version'
                 }
             }
         }
         stage('Version & Analysis') {
             parallel {
                 stage('Version Bump') {
+                    // disable when {} when used in a Pipelone
                     when { branch 'master' }
+                    // requires: https://plugins.jenkins.io/pipeline-utility-steps
                     environment {
                         NEW_VERSION = gitNextSemverTagMaven('pom.xml')
                     }
@@ -75,26 +88,31 @@ spec:
                     }
                 }
                 stage('Sonar Analysis') {
+                    // disable when {} when used in a Pipelone
                     when {branch 'master'}
-                    environment {
-                        SONAR_HOST="http://sonar-sonarqube:9000"
-                        SONAR_TOKEN=credentials('sonar')
-                    }
+                    // environment {
+                    //     SONAR_HOST="http://messy-vulture-sonarqube.cicd:9000"
+                    //     SONAR_TOKEN=credentials('sonar')
+                    // }
                     steps {
                         container('maven') {
-                            sh 'mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}'
+                            // sh 'mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}'
+                            withSonarQubeEnv('mysonar') {
+                                sh 'mvn -e org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.0.1398:sonar'
+                            }
                         }
                     }
                 }
             }
         }
         stage('Publish Artifact') {
+            // disable when {} when used in a Pipelone
             when { branch 'master' }
             steps {
                 container('maven') {
                     // #1 = credentialsId for artifactory
                     // #2 = distributionManagement.id
-                    generateMavenSettings('artifactory', 'releases')
+                    generateMavenSettings('nexus', 'nexus')
                     sh 'mvn deploy -s jenkins-settings.xml'
                 }
             }
@@ -103,11 +121,6 @@ spec:
                     cleanMavenSettings()
                 }
             }
-        }
-    }
-    post {
-        always {
-            cleanWs()
         }
     }
 }
